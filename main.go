@@ -23,13 +23,15 @@ func main() {
 	}
 
 	solve := days[currentDay].Solve1
+	part := "1"
 	if slices.Contains(os.Args, "--hard") {
 		solve = days[currentDay].Solve2
+		part = "2"
 	}
 
-	fmt.Println("/------------ SAMPLE ------------/")
+	fmt.Printf("/------------ SAMPLE (%s) ------------/\n", part)
 	solve("./day_" + currentDay + "/sample.txt")
 
-	fmt.Println("/------------ INPUT  ------------/")
+	fmt.Printf("/------------ INPUT  (%s) ------------/\n", part)
 	solve("./day_" + currentDay + "/input.txt")
 }
