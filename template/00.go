@@ -1,4 +1,4 @@
-package day_01
+package day_00
 
 import (
 	. "aoc-2023/helpers"
