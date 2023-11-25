@@ -40,6 +40,19 @@ func Min[T cmp.Ordered](xs []T) T {
 	return min
 }
 
+func Cells[T any](m [][]T) chan T {
+	ch := make(chan T)
+	go func() {
+		for _, row := range m {
+			for _, cell := range row {
+				ch <- cell
+			}
+		}
+		close(ch)
+	}()
+	return ch
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
