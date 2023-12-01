@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"time"
 )
 
 type Solver struct {
@@ -17,10 +16,7 @@ func main() {
 	days := map[string]Solver{
 		"01": {day_01.Solve1, day_01.Solve2},
 	}
-	currentDay := fmt.Sprintf("%02d", time.Now().Day())
-	if len(os.Args) > 1 {
-		currentDay = os.Args[1]
-	}
+	currentDay := os.Args[1]
 
 	solve := days[currentDay].Solve1
 	part := "1"
