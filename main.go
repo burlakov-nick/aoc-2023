@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc-2023/day_01"
+	"aoc-2023/day_02"
 	"fmt"
 	"os"
 	"slices"
@@ -15,6 +16,7 @@ type Solver struct {
 func main() {
 	days := map[string]Solver{
 		"01": {day_01.Solve1, day_01.Solve2},
+		"02": {day_02.Solve1, day_02.Solve2},
 	}
 	currentDay := os.Args[1]
 
@@ -25,9 +27,13 @@ func main() {
 		part = "2"
 	}
 
-	fmt.Printf("/------------ SAMPLE (%s) ------------/\n", part)
-	solve("./day_" + currentDay + "/sample.txt")
+	if !slices.Contains(os.Args, "--only-input") {
+		fmt.Printf("/------------ SAMPLE (%s) ------------/\n", part)
+		solve("./day_" + currentDay + "/sample.txt")
+	}
 
-	fmt.Printf("/------------ INPUT  (%s) ------------/\n", part)
-	solve("./day_" + currentDay + "/input.txt")
+	if !slices.Contains(os.Args, "--only-sample") {
+		fmt.Printf("/------------ INPUT  (%s) ------------/\n", part)
+		solve("./day_" + currentDay + "/input.txt")
+	}
 }
