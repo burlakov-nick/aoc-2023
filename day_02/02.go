@@ -25,36 +25,33 @@ func parseColors(round string) Colors {
 	return Colors{parse("red"), parse("green"), parse("blue")}
 }
 
+func getMaxColorsNeeded(line string) Colors {
+	rounds := strings.Split(line, ";")
+	mx := Colors{0, 0, 0}
+	for _, round := range rounds {
+		colors := parseColors(round)
+		mx = Colors{max(mx.red, colors.red), max(mx.green, colors.green), max(mx.blue, colors.blue)}
+	}
+	return mx
+}
+
 func Solve1(filepath string) {
-	mx := Colors{12, 13, 14}
+	available := Colors{12, 13, 14}
 	sum := 0
 
 	for i, line := range ReadLines(filepath) {
-		isPossible := true
-		rounds := strings.Split(line, ";")
-		for _, round := range rounds {
-			colors := parseColors(round)
-			if colors.red > mx.red || colors.green > mx.green || colors.blue > mx.blue {
-				isPossible = false
-			}
-		}
-		if isPossible {
+		mx := getMaxColorsNeeded(line)
+		if available.red >= mx.red && available.green >= mx.green && available.blue >= mx.blue {
 			sum += i + 1
 		}
 	}
-
 	println(sum)
 }
 
 func Solve2(filepath string) {
 	sum := 0
 	for _, line := range ReadLines(filepath) {
-		mx := Colors{0, 0, 0}
-		rounds := strings.Split(line, ";")
-		for _, round := range rounds {
-			colors := parseColors(round)
-			mx = Colors{max(mx.red, colors.red), max(mx.green, colors.green), max(mx.blue, colors.blue)}
-		}
+		mx := getMaxColorsNeeded(line)
 		sum += mx.red * mx.green * mx.blue
 	}
 	println(sum)
