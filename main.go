@@ -3,6 +3,7 @@ package main
 import (
 	"aoc-2023/day_01"
 	"aoc-2023/day_02"
+	"aoc-2023/day_03"
 	"fmt"
 	"os"
 	"slices"
@@ -17,6 +18,7 @@ func main() {
 	days := map[string]Solver{
 		"01": {day_01.Solve1, day_01.Solve2},
 		"02": {day_02.Solve1, day_02.Solve2},
+		"03": {day_03.Solve1, day_03.Solve2},
 	}
 	currentDay := os.Args[1]
 

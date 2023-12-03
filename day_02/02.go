@@ -3,7 +3,6 @@ package day_02
 import (
 	. "aoc-2023/helpers"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -18,8 +17,7 @@ func parseColors(round string) Colors {
 		if len(matched) == 0 {
 			return 0
 		}
-		parsed, _ := strconv.Atoi(matched[1])
-		return parsed
+		return Int(matched[1])
 	}
 
 	return Colors{parse("red"), parse("green"), parse("blue")}
