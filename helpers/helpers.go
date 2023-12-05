@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"cmp"
 	"os"
 	"strconv"
 	"strings"
@@ -12,8 +13,33 @@ func ReadLines(filename string) []string {
 	return strings.Split(string(bytes), "\n")
 }
 
-func ParseInts(line string, sep string) []int {
-	tokens := strings.Split(line, sep)
+func ReadBlocks(filename string) [][]string {
+	lines := ReadLines(filename)
+	blocks := [][]string{}
+	block := []string{}
+	for _, line := range lines {
+		if line == "" {
+			blocks = append(blocks, block)
+			block = []string{}
+		} else {
+			block = append(block, line)
+		}
+	}
+	if len(block) > 0 {
+		blocks = append(blocks, block)
+	}
+	return blocks
+}
+
+func Trim(line string, trim ...string) string {
+	for _, t := range trim {
+		line = strings.ReplaceAll(line, t, "")
+	}
+	return line
+}
+
+func ParseInts(line string, sep string, trim ...string) []int {
+	tokens := strings.Split(Trim(line, trim...), sep)
 	xs := []int{}
 	for _, token := range tokens {
 		x, err := strconv.Atoi(token)
@@ -32,6 +58,34 @@ func Sum[T int | int64 | float64](xs []T) T {
 	return s
 }
 
+func Max[T cmp.Ordered](s []T) T {
+	if len(s) == 0 {
+		var zero T
+		return zero
+	}
+	m := s[0]
+	for _, v := range s {
+		if m < v {
+			m = v
+		}
+	}
+	return m
+}
+
+func Min[T cmp.Ordered](s []T) T {
+	if len(s) == 0 {
+		var zero T
+		return zero
+	}
+	m := s[0]
+	for _, v := range s {
+		if m > v {
+			m = v
+		}
+	}
+	return m
+}
+
 func Distinct[T string | int](items []T) []T {
 	seen := make(map[T]bool)
 	result := []T{}
@@ -42,6 +96,14 @@ func Distinct[T string | int](items []T) []T {
 		}
 	}
 	return result
+}
+
+func Map[T1 any, T2 any](items []T1, mp func(T1) T2) []T2 {
+	res := []T2{}
+	for _, x := range items {
+		res = append(res, mp(x))
+	}
+	return res
 }
 
 func Cells[T any](m [][]T) chan T {
@@ -84,6 +146,10 @@ func Int(s string) int {
 	i, err := strconv.Atoi(s)
 	check(err)
 	return i
+}
+
+func Ints(s string) []int {
+	return ParseInts(s, " ")
 }
 
 type Set[T comparable] struct {
