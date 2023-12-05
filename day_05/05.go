@@ -80,14 +80,28 @@ func convert(x int, mappings [][]MapInfo) int {
 func Solve1(filepath string) {
 	seeds, mappings := parseInput(filepath)
 
-	converted := Map(seeds, func(s int) int {
-		return convert(s, mappings)
-	})
-	mn := Min(converted)
-	println(mn)
+	for _, mapping := range mappings {
+		for i := 0; i < len(seeds); i++ {
+			for _, m := range mapping {
+				if m.source.Inside(seeds[i]) {
+					seeds[i] += m.shift
+					break
+				}
+			}
+		}
+	}
+
+	println(Min(seeds))
 }
 
-func convert2(segments []Segment, mappings [][]MapInfo) []Segment {
+func Solve2(filepath string) {
+	seeds, mappings := parseInput(filepath)
+
+	var segments []Segment
+	for i := 0; i < len(seeds); i += 2 {
+		segments = append(segments, Segment{seeds[i], seeds[i] + seeds[i+1] - 1})
+	}
+
 	for _, mapping := range mappings {
 		var newSegments []Segment
 		var unmapped []Segment
@@ -104,20 +118,10 @@ func convert2(segments []Segment, mappings [][]MapInfo) []Segment {
 		newSegments = append(newSegments, unmapped...)
 		segments = newSegments
 	}
-	return segments
-}
 
-func Solve2(filepath string) {
-	seeds, mappings := parseInput(filepath)
-
-	var segments []Segment
-	for i := 0; i < len(seeds); i += 2 {
-		segments = append(segments, Segment{seeds[i], seeds[i] + seeds[i+1] - 1})
+	mn := segments[0].left
+	for _, s := range segments {
+		mn = min(mn, s.left)
 	}
-	segments = convert2(segments, mappings)
-
-	mn := Min(Map(segments, func(x Segment) int {
-		return x.left
-	}))
 	println(mn)
 }
