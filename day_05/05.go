@@ -4,27 +4,81 @@ import (
 	. "aoc-2023/helpers"
 )
 
-func parseMapping(block []string) [][]int {
-	return Map(block[1:], Ints)
+// Segment inclusive
+type Segment struct {
+	left, right int
 }
 
-func convert(id int, mappings [][][]int) int {
+type MapInfo struct {
+	source Segment
+	shift  int
+}
+
+func (x Segment) IsIntersecting(other Segment) bool {
+	return x.left <= other.right && other.left <= x.right
+}
+
+func (x Segment) Intersect(other Segment) Segment {
+	left := max(x.left, other.left)
+	right := min(x.right, other.right)
+	return Segment{left, right}
+}
+
+func (x Segment) Shift(shift int) Segment {
+	return Segment{x.left + shift, x.right + shift}
+}
+
+func (x Segment) Inside(p int) bool {
+	return x.left <= p && p <= x.right
+}
+
+func remove(xs []Segment, c Segment) []Segment {
+	var res []Segment
+	for _, x := range xs {
+		if !x.IsIntersecting(c) {
+			res = append(res, x)
+			continue
+		}
+		if x.left < c.left && c.left <= x.right {
+			res = append(res, Segment{x.left, c.left - 1})
+		}
+		if x.left <= c.right && c.right < x.right {
+			res = append(res, Segment{c.right + 1, x.right})
+		}
+	}
+	return res
+}
+
+func parseInput(filepath string) ([]int, [][]MapInfo) {
+	blocks := ReadBlocks(filepath)
+	seeds := ParseInts(blocks[0][0], " ", "seeds: ")
+	var mappings [][]MapInfo
+	for _, block := range blocks[1:] {
+		var mapping []MapInfo
+		for _, line := range block[1:] {
+			ints := Ints(line)
+			dest, source, length := ints[0], ints[1], ints[2]
+			mapping = append(mapping, MapInfo{Segment{source, source + length - 1}, dest - source})
+		}
+		mappings = append(mappings, mapping)
+	}
+	return seeds, mappings
+}
+
+func convert(x int, mappings [][]MapInfo) int {
 	for _, mapping := range mappings {
-		for _, desc := range mapping {
-			dest, src, length := desc[0], desc[1], desc[2]
-			if src <= id && id < src+length {
-				id = dest + (id - src)
+		for _, m := range mapping {
+			if m.source.Inside(x) {
+				x += m.shift
 				break
 			}
 		}
 	}
-	return id
+	return x
 }
 
 func Solve1(filepath string) {
-	blocks := ReadBlocks(filepath)
-	seeds := ParseInts(blocks[0][0], " ", "seeds: ")
-	mappings := Map(blocks[1:], parseMapping)
+	seeds, mappings := parseInput(filepath)
 
 	converted := Map(seeds, func(s int) int {
 		return convert(s, mappings)
@@ -33,57 +87,28 @@ func Solve1(filepath string) {
 	println(mn)
 }
 
-type Segment struct {
-	left, right int
-}
-
-func cut(xs []Segment, left, right int) []Segment {
-	var res []Segment
-	for _, x := range xs {
-		if left <= x.left && x.right <= right {
-		} else if x.right < left || x.left > right {
-			res = append(res, x)
-		} else if x.left < left && right < x.right {
-			res = append(res, Segment{x.left, left - 1})
-			res = append(res, Segment{right + 1, x.right})
-		} else if left > x.left {
-			res = append(res, Segment{x.left, left - 1})
-		} else if right < x.right {
-			res = append(res, Segment{right + 1, x.right})
-		}
-	}
-	return res
-}
-
-func convert2(segments []Segment, mappings [][][]int) []Segment {
+func convert2(segments []Segment, mappings [][]MapInfo) []Segment {
 	for _, mapping := range mappings {
 		var newSegments []Segment
-		var rest []Segment
-		rest = append(rest, segments...)
-		for _, desc := range mapping {
-			dest, src, length := desc[0], desc[1], desc[2]
+		var unmapped []Segment
+		unmapped = append(unmapped, segments...)
+		for _, m := range mapping {
 			for _, x := range segments {
-				if x.right < src || x.left >= src+length {
-				} else {
-					oldLeft := max(x.left, src)
-					oldRight := min(x.right, src+length-1)
-					newLeft := dest + oldLeft - src
-					newRight := dest + oldRight - src
-					rest = cut(rest, oldLeft, oldRight)
-					newSegments = append(newSegments, Segment{newLeft, newRight})
+				if x.IsIntersecting(m.source) {
+					old := x.Intersect(m.source)
+					unmapped = remove(unmapped, old)
+					newSegments = append(newSegments, old.Shift(m.shift))
 				}
 			}
 		}
-		newSegments = append(newSegments, rest...)
+		newSegments = append(newSegments, unmapped...)
 		segments = newSegments
 	}
 	return segments
 }
 
 func Solve2(filepath string) {
-	blocks := ReadBlocks(filepath)
-	seeds := ParseInts(blocks[0][0], " ", "seeds: ")
-	mappings := Map(blocks[1:], parseMapping)
+	seeds, mappings := parseInput(filepath)
 
 	var segments []Segment
 	for i := 0; i < len(seeds); i += 2 {
