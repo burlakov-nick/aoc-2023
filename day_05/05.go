@@ -65,18 +65,6 @@ func parseInput(filepath string) ([]int, [][]MapInfo) {
 	return seeds, mappings
 }
 
-func convert(x int, mappings [][]MapInfo) int {
-	for _, mapping := range mappings {
-		for _, m := range mapping {
-			if m.source.Inside(x) {
-				x += m.shift
-				break
-			}
-		}
-	}
-	return x
-}
-
 func Solve1(filepath string) {
 	seeds, mappings := parseInput(filepath)
 
