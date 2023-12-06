@@ -32,7 +32,7 @@ func (x Segment) Inside(p int) bool {
 	return x.left <= p && p <= x.right
 }
 
-func remove(xs []Segment, c Segment) []Segment {
+func cutSegment(xs []Segment, c Segment) []Segment {
 	var res []Segment
 	for _, x := range xs {
 		if !x.IsIntersecting(c) {
@@ -98,7 +98,7 @@ func Solve2(filepath string) {
 			for _, x := range segments {
 				if x.IsIntersecting(m.source) {
 					old := x.Intersect(m.source)
-					unmapped = remove(unmapped, old)
+					unmapped = cutSegment(unmapped, old)
 					newSegments = append(newSegments, old.Shift(m.shift))
 				}
 			}
