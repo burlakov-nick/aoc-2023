@@ -6,6 +6,7 @@ import (
 	"aoc-2023/day_03"
 	"aoc-2023/day_04"
 	"aoc-2023/day_05"
+	"aoc-2023/day_06"
 	"fmt"
 	"os"
 	"slices"
@@ -23,6 +24,7 @@ func main() {
 		"03": {day_03.Solve1, day_03.Solve2},
 		"04": {day_04.Solve1, day_04.Solve2},
 		"05": {day_05.Solve1, day_05.Solve2},
+		"06": {day_06.Solve1, day_06.Solve2},
 	}
 	currentDay := os.Args[1]
 
@@ -33,12 +35,12 @@ func main() {
 		part = "2"
 	}
 
-	if !slices.Contains(os.Args, "--only-input") {
+	if !slices.Contains(os.Args, "--input") {
 		fmt.Printf("/------------ SAMPLE (%s) ------------/\n", part)
 		solve("./day_" + currentDay + "/sample.txt")
 	}
 
-	if !slices.Contains(os.Args, "--only-sample") {
+	if !slices.Contains(os.Args, "--sample") {
 		fmt.Printf("/------------ INPUT  (%s) ------------/\n", part)
 		solve("./day_" + currentDay + "/input.txt")
 	}
