@@ -66,10 +66,9 @@ func parseHands(filepath string, useJokers bool) []Hand {
 	return hands
 }
 
-func Solve1(filepath string) {
-	hands := parseHands(filepath, false)
+func solve(filepath string, useJoker bool, cardsOrder string) {
+	hands := parseHands(filepath, useJoker)
 
-	cardsOrder := "AKQJT98765432"
 	sort.Slice(hands, func(i, j int) bool {
 		return less(hands[i], hands[j], cardsOrder)
 	})
@@ -81,17 +80,10 @@ func Solve1(filepath string) {
 	println(s)
 }
 
+func Solve1(filepath string) {
+	solve(filepath, false, "AKQJT98765432")
+}
+
 func Solve2(filepath string) {
-	hands := parseHands(filepath, true)
-
-	cardsOrder := "AKQT98765432J"
-	sort.Slice(hands, func(i, j int) bool {
-		return less(hands[i], hands[j], cardsOrder)
-	})
-
-	s := 0
-	for i, hand := range hands {
-		s += (i + 1) * hand.value
-	}
-	println(s)
+	solve(filepath, true, "AKQT98765432J")
 }
