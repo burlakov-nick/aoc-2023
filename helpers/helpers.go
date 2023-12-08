@@ -31,15 +31,15 @@ func ReadBlocks(filename string) [][]string {
 	return blocks
 }
 
-func Trim(line string, trim ...string) string {
-	for _, t := range trim {
+func Remove(line string, tokens ...string) string {
+	for _, t := range tokens {
 		line = strings.ReplaceAll(line, t, "")
 	}
 	return line
 }
 
-func ParseInts(line string, sep string, trim ...string) []int {
-	tokens := strings.Split(Trim(line, trim...), sep)
+func ParseInts(line string, sep string, remove ...string) []int {
+	tokens := strings.Split(Remove(line, remove...), sep)
 	xs := []int{}
 	for _, token := range tokens {
 		x, err := strconv.Atoi(token)
@@ -104,6 +104,15 @@ func Map[T1 any, T2 any](items []T1, mp func(T1) T2) []T2 {
 		res = append(res, mp(x))
 	}
 	return res
+}
+
+func All[T any](xs []T, f func(T) bool) bool {
+	for _, x := range xs {
+		if !f(x) {
+			return false
+		}
+	}
+	return true
 }
 
 func Cells[T any](m [][]T) chan T {
@@ -196,6 +205,18 @@ func (s Set[T]) Intersect(other Set[T]) Set[T] {
 		}
 	}
 	return result
+}
+
+func GCD(a, b int) int {
+	for b != 0 {
+		a %= b
+		a, b = b, a
+	}
+	return a
+}
+
+func LCM(a, b int) int {
+	return a / GCD(a, b) * b
 }
 
 func check(e error) {
