@@ -6,17 +6,17 @@ import (
 )
 
 func extrapolate(xs []int) []int {
+	if All(xs, func(x int) bool { return x == 0 }) {
+		slices.Insert(xs, 0, 0)
+		xs = append(xs, 0)
+		return xs
+	}
+
 	var diffs []int
 	for i := 0; i < len(xs)-1; i++ {
 		diffs = append(diffs, xs[i+1]-xs[i])
 	}
-
-	if All(diffs, func(x int) bool { return x == 0 }) {
-		diffs = slices.Insert(diffs, 0, 0)
-		diffs = append(diffs, 0)
-	} else {
-		diffs = extrapolate(diffs)
-	}
+	diffs = extrapolate(diffs)
 
 	xs = slices.Insert(xs, 0, xs[0]-diffs[0])
 	xs = append(xs, diffs[len(diffs)-1]+xs[len(xs)-1])
