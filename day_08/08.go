@@ -37,6 +37,7 @@ func (n Network) CountSteps(start string, isFinish func(string) bool) int {
 func Solve1(filepath string) {
 	network := parse(filepath)
 	isFinish := func(s string) bool { return s == "ZZZ" }
+
 	println(network.CountSteps("AAA", isFinish))
 }
 
