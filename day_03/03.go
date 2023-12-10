@@ -16,7 +16,7 @@ func Solve2(filepath string) {
 	sz := Vec{len(field), len(field[0])}
 
 	sum := 0
-	gears := make(map[Vec]Set[int])
+	gears := make(map[Vec][]int)
 	for x, line := range field {
 		matched := re.FindAllStringSubmatchIndex(line, -1)
 		for _, match := range matched {
@@ -24,13 +24,13 @@ func Solve2(filepath string) {
 			number := Int(line[l:r])
 			hasSymbolAround := false
 			for y := l; y < r; y++ {
-				for n := range Neighbors8(Vec{x, y}, sz) {
+				for n := range Neighbors8Boxed(Vec{x, y}, sz) {
 					ch := rune(field[n.X][n.Y])
 					if ch != '.' && !unicode.IsDigit(ch) {
 						hasSymbolAround = true
 					}
 					if ch == '*' {
-						gears[n] = gears[n].Add(number)
+						gears[n] = append(gears[n], number)
 					}
 				}
 			}
@@ -43,9 +43,9 @@ func Solve2(filepath string) {
 
 	sumGears := 0
 	for _, v := range gears {
-		x := v.Items()
-		if len(x) == 2 {
-			sumGears += x[0] * x[1]
+		v := Distinct(v)
+		if len(v) == 2 {
+			sumGears += v[0] * v[1]
 		}
 	}
 	println(sumGears)

@@ -3,6 +3,7 @@ package helpers
 import (
 	"cmp"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -132,7 +133,64 @@ type Vec struct {
 	X, Y int
 }
 
-func Neighbors8(v Vec, sz Vec) chan Vec {
+func (p Vec) Inside(sz Vec) bool {
+	return 0 <= p.X && p.X < sz.X && 0 <= p.Y && p.Y < sz.Y
+}
+
+func (p Vec) Add(other Vec) Vec {
+	return Vec{p.X + other.X, p.Y + other.Y}
+}
+
+func (p Vec) Equals(other Vec) bool {
+	return p.X == other.X && p.Y == other.Y
+}
+
+func (p Vec) Less(other Vec) bool {
+	if p.X != other.X {
+		return p.X < other.X
+	}
+	return p.Y < other.Y
+}
+
+func (p Vec) Rotate() Vec {
+	return Vec{-p.Y, p.X}
+}
+
+func (p Vec) RotateClockwise() Vec {
+	return Vec{p.Y, -p.X}
+}
+
+func Neighbors4(v Vec) chan Vec {
+	dx := [4]int{-1, 1, 0, 0}
+	dy := [4]int{0, 0, -1, 1}
+	ch := make(chan Vec)
+	go func() {
+		for i := 0; i < 4; i++ {
+			t := Vec{v.X + dx[i], v.Y + dy[i]}
+			ch <- t
+		}
+		close(ch)
+	}()
+	return ch
+}
+
+func Neighbors4Boxed(v Vec, sz Vec) chan Vec {
+	dx := [4]int{-1, 1, 0, 0}
+	dy := [4]int{0, 0, -1, 1}
+	ch := make(chan Vec)
+	go func() {
+		for i := 0; i < 4; i++ {
+			t := Vec{v.X + dx[i], v.Y + dy[i]}
+			if t.Inside(sz) {
+				ch <- t
+			}
+		}
+		close(ch)
+	}()
+	return ch
+}
+
+func Neighbors8Boxed(v Vec, sz Vec) chan Vec {
 	ch := make(chan Vec)
 	go func() {
 		for dx := -1; dx < 2; dx++ {
@@ -141,7 +199,7 @@ func Neighbors8(v Vec, sz Vec) chan Vec {
 					continue
 				}
 				t := Vec{v.X + dx, v.Y + dy}
-				if 0 <= t.X && t.X < sz.X && 0 <= t.Y && t.Y < sz.Y {
+				if t.Inside(sz) {
 					ch <- t
 				}
 			}
@@ -165,20 +223,25 @@ type Set[T comparable] struct {
 	items map[T]bool
 }
 
-func ToSet[T comparable](items []T) Set[T] {
+func NewSet[T comparable](items ...T) Set[T] {
 	xs := Set[T]{}
+	xs.items = make(map[T]bool)
 	for _, x := range items {
-		xs = xs.Add(x)
+		xs.Add(x)
 	}
 	return xs
 }
 
-func (s Set[T]) Add(x T) Set[T] {
-	if s.items == nil {
-		s.items = make(map[T]bool)
+func ToSet[T comparable](items []T) Set[T] {
+	xs := NewSet[T]()
+	for _, x := range items {
+		xs.Add(x)
 	}
+	return xs
+}
+
+func (s Set[T]) Add(x T) {
 	s.items[x] = true
-	return s
 }
 
 func (s Set[T]) Contains(x T) bool {
@@ -198,13 +261,19 @@ func (s Set[T]) Items() []T {
 }
 
 func (s Set[T]) Intersect(other Set[T]) Set[T] {
-	result := Set[T]{}
+	result := NewSet[T]()
 	for _, x := range s.Items() {
 		if other.Contains(x) {
-			result = result.Add(x)
+			result.Add(x)
 		}
 	}
 	return result
+}
+
+func (s Set[T]) Extend(other Set[T]) {
+	for _, x := range other.Items() {
+		s.Add(x)
+	}
 }
 
 func GCD(a, b int) int {
@@ -217,6 +286,11 @@ func GCD(a, b int) int {
 
 func LCM(a, b int) int {
 	return a / GCD(a, b) * b
+}
+
+func RegexReplace(pattern, src, repl string) string {
+	re := regexp.MustCompile(pattern)
+	return re.ReplaceAllString(src, repl)
 }
 
 func check(e error) {
