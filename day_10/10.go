@@ -38,7 +38,7 @@ func Solve(filepath string) {
 		for y := 0; y < len(field[0]); y++ {
 			from := Vec{X: x, Y: y}
 			if !loop.Contains(from) {
-				field[x] = field[x][:y] + "." + field[x][y+1:]
+				field[x] = ReplaceAt(field[x], y, ".")
 			}
 		}
 	}

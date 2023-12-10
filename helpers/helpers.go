@@ -293,6 +293,10 @@ func RegexReplace(pattern, src, repl string) string {
 	return re.ReplaceAllString(src, repl)
 }
 
+func ReplaceAt(src string, index int, repl string) string {
+	return src[:index] + repl + src[index+1:]
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
