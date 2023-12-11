@@ -107,6 +107,16 @@ func Map[T1 any, T2 any](items []T1, mp func(T1) T2) []T2 {
 	return res
 }
 
+func Count[T any](xs []T, f func(T) bool) int {
+	c := 0
+	for _, x := range xs {
+		if f(x) {
+			c += 1
+		}
+	}
+	return c
+}
+
 func All[T any](xs []T, f func(T) bool) bool {
 	for _, x := range xs {
 		if !f(x) {
@@ -158,6 +168,10 @@ func (p Vec) Rotate() Vec {
 
 func (p Vec) RotateClockwise() Vec {
 	return Vec{p.Y, -p.X}
+}
+
+func (p Vec) ManhattanDist(other Vec) int {
+	return Abs(p.X-other.X) + Abs(p.Y-other.Y)
 }
 
 func Neighbors4(v Vec) chan Vec {
@@ -293,8 +307,25 @@ func RegexReplace(pattern, src, repl string) string {
 	return re.ReplaceAllString(src, repl)
 }
 
-func ReplaceAt(src string, index int, repl string) string {
+func ReplaceStringAt(src string, index int, repl string) string {
 	return src[:index] + repl + src[index+1:]
+}
+
+func TransposeStrings(src []string) []string {
+	result := make([]string, len(src[0]))
+	for _, line := range src {
+		for y, c := range line {
+			result[y] = result[y] + string(c)
+		}
+	}
+	return result
+}
+
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
 
 func check(e error) {
