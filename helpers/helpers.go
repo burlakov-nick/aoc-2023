@@ -126,6 +126,14 @@ func All[T any](xs []T, f func(T) bool) bool {
 	return true
 }
 
+func Repeat[T any](value T, n int) []T {
+	xs := make([]T, n)
+	for i := 0; i < n; i++ {
+		xs[i] = value
+	}
+	return xs
+}
+
 func Cells[T any](m [][]T) chan T {
 	ch := make(chan T)
 	go func() {
