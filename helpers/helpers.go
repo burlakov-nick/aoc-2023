@@ -32,6 +32,14 @@ func ReadBlocks(filename string) [][]string {
 	return blocks
 }
 
+func Reverse(s string) string {
+	res := make([]uint8, len(s))
+	for i := 0; i < len(s); i++ {
+		res[i] = s[len(s)-1-i]
+	}
+	return string(res)
+}
+
 func Remove(line string, tokens ...string) string {
 	for _, t := range tokens {
 		line = strings.ReplaceAll(line, t, "")
