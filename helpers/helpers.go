@@ -344,6 +344,10 @@ func Abs(x int) int {
 	return x
 }
 
+func Sign(x int) int {
+	return x / Abs(x)
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
