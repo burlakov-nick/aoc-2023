@@ -59,6 +59,10 @@ func ParseInts(line string, sep string, remove ...string) []int {
 	return xs
 }
 
+func RemoveAt[T any](xs []T, i int) []T {
+	return append(xs[:i], xs[i+1:]...)
+}
+
 func Sum[T int | int64 | float64](xs []T) T {
 	var s T
 	for _, x := range xs {
