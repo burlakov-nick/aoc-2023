@@ -70,6 +70,5 @@ func Solve2(filepath string) {
 		best = max(best, countEnergized(0, i, 1, 0, field))
 		best = max(best, countEnergized(len(field)-1, i, -1, 0, field))
 	}
-	// 8134 -- too low
 	println(best)
 }
