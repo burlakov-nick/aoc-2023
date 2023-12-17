@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"cmp"
+	"container/heap"
 	"os"
 	"regexp"
 	"strconv"
@@ -169,6 +170,10 @@ func (p Vec) Inside(sz Vec) bool {
 
 func (p Vec) Add(other Vec) Vec {
 	return Vec{p.X + other.X, p.Y + other.Y}
+}
+
+func (p Vec) Mul(k int) Vec {
+	return Vec{p.X * k, p.Y * k}
 }
 
 func (p Vec) Equals(other Vec) bool {
@@ -350,6 +355,48 @@ func Abs(x int) int {
 
 func Sign(x int) int {
 	return x / Abs(x)
+}
+
+type HeapPair[T any] struct {
+	value   int
+	payload T
+}
+type HeapList[T any] []HeapPair[T]
+
+func (h HeapList[T]) Len() int           { return len(h) }
+func (h HeapList[T]) Less(i, j int) bool { return h[i].value < h[j].value }
+func (h HeapList[T]) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *HeapList[T]) Push(x any) {
+	*h = append(*h, x.(HeapPair[T]))
+}
+func (h *HeapList[T]) Pop() any {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+type Heap[T any] struct {
+	list *HeapList[T]
+}
+
+func NewHeap[T any]() Heap[T] {
+	list := make(HeapList[T], 0)
+	return Heap[T]{list: &list}
+}
+
+func (h Heap[T]) Push(payload T, value int) {
+	heap.Push(h.list, HeapPair[T]{value, payload})
+}
+
+func (h Heap[T]) Pop() (T, int) {
+	hp := heap.Pop(h.list).(HeapPair[T])
+	return hp.payload, hp.value
+}
+
+func (h Heap[T]) Empty() bool {
+	return len(*h.list) == 0
 }
 
 func check(e error) {
