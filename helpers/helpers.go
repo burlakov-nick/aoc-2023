@@ -100,6 +100,12 @@ func Min[T cmp.Ordered](s []T) T {
 	return m
 }
 
+func Copy[T any](src []T) []T {
+	dst := make([]T, len(src))
+	copy(dst, src)
+	return dst
+}
+
 func Distinct[T string | int](items []T) []T {
 	seen := make(map[T]bool)
 	result := []T{}
@@ -252,6 +258,12 @@ func Int(s string) int {
 	i, err := strconv.Atoi(s)
 	check(err)
 	return i
+}
+
+func HexToInt(s string) int {
+	i, err := strconv.ParseInt(s, 16, 0)
+	check(err)
+	return int(i)
 }
 
 func Ints(s string) []int {
