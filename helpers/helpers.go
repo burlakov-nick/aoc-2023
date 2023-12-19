@@ -64,6 +64,14 @@ func RemoveAt[T any](xs []T, i int) []T {
 	return append(xs[:i], xs[i+1:]...)
 }
 
+func Values[K comparable, V any](m map[K]V) []V {
+	vs := make([]V, 0)
+	for _, v := range m {
+		vs = append(vs, v)
+	}
+	return vs
+}
+
 func Sum[T int | int64 | float64](xs []T) T {
 	var s T
 	for _, x := range xs {
