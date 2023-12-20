@@ -303,6 +303,10 @@ func (s Set[T]) Add(x T) {
 	s.items[x] = true
 }
 
+func (s Set[T]) Remove(x T) {
+	delete(s.items, x)
+}
+
 func (s Set[T]) Contains(x T) bool {
 	return s.items[x]
 }
