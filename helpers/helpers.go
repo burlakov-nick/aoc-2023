@@ -423,6 +423,10 @@ func (h Heap[T]) Empty() bool {
 	return len(*h.list) == 0
 }
 
+func Mod(a, b int) int {
+	return ((a % b) + b) % b
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
