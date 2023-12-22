@@ -262,6 +262,14 @@ func Neighbors8Boxed(v Vec, sz Vec) chan Vec {
 	return ch
 }
 
+type Vec3 struct {
+	X, Y, Z int
+}
+
+func (p Vec3) Add(other Vec3) Vec3 {
+	return Vec3{p.X + other.X, p.Y + other.Y, p.Z + other.Z}
+}
+
 func Int(s string) int {
 	i, err := strconv.Atoi(s)
 	check(err)
@@ -337,6 +345,15 @@ func (s Set[T]) Extend(other Set[T]) {
 	for _, x := range other.Items() {
 		s.Add(x)
 	}
+}
+
+func (s Set[T]) IsSuperSet(other Set[T]) bool {
+	for _, x := range other.Items() {
+		if !s.Contains(x) {
+			return false
+		}
+	}
+	return true
 }
 
 func GCD(a, b int) int {

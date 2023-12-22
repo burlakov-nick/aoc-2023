@@ -22,6 +22,7 @@ import (
 	"aoc-2023/day_19"
 	"aoc-2023/day_20"
 	"aoc-2023/day_21"
+	"aoc-2023/day_22"
 	"fmt"
 	"os"
 	"slices"
@@ -55,6 +56,7 @@ func main() {
 		"19": {day_19.Solve1, day_19.Solve2},
 		"20": {day_20.Solve1, day_20.Solve2},
 		"21": {day_21.Solve, day_21.Solve},
+		"22": {day_22.Solve, day_22.Solve},
 	}
 	currentDay := os.Args[1]
 
