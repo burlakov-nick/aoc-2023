@@ -27,7 +27,7 @@ func Solve(filepath string) {
 		}
 		newPoints := NewSet[Vec]()
 		for _, from := range points.Items() {
-			for next := range Neighbors4(from) {
+			for _, next := range Neighbors4(from) {
 				if field[Mod(next.X, sz)][Mod(next.Y, sz)] == '#' {
 					continue
 				}

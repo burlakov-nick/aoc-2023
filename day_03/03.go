@@ -24,7 +24,7 @@ func Solve2(filepath string) {
 			number := Int(line[l:r])
 			hasSymbolAround := false
 			for y := l; y < r; y++ {
-				for n := range Neighbors8Boxed(Vec{x, y}, sz) {
+				for _, n := range Neighbors8Boxed(Vec{x, y}, sz) {
 					ch := rune(field[n.X][n.Y])
 					if ch != '.' && !unicode.IsDigit(ch) {
 						hasSymbolAround = true

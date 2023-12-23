@@ -213,53 +213,44 @@ func (p Vec) ManhattanDist(other Vec) int {
 	return Abs(p.X-other.X) + Abs(p.Y-other.Y)
 }
 
-func Neighbors4(v Vec) chan Vec {
+func Neighbors4(v Vec) []Vec {
 	dx := [4]int{-1, 1, 0, 0}
 	dy := [4]int{0, 0, -1, 1}
-	ch := make(chan Vec)
-	go func() {
-		for i := 0; i < 4; i++ {
-			t := Vec{v.X + dx[i], v.Y + dy[i]}
-			ch <- t
-		}
-		close(ch)
-	}()
-	return ch
+	res := make([]Vec, 0)
+	for i := 0; i < 4; i++ {
+		t := Vec{v.X + dx[i], v.Y + dy[i]}
+		res = append(res, t)
+	}
+	return res
 }
 
-func Neighbors4Boxed(v Vec, sz Vec) chan Vec {
+func Neighbors4Boxed(v, sz Vec) []Vec {
 	dx := [4]int{-1, 1, 0, 0}
 	dy := [4]int{0, 0, -1, 1}
-	ch := make(chan Vec)
-	go func() {
-		for i := 0; i < 4; i++ {
-			t := Vec{v.X + dx[i], v.Y + dy[i]}
+	res := make([]Vec, 0)
+	for i := 0; i < 4; i++ {
+		t := Vec{v.X + dx[i], v.Y + dy[i]}
+		if t.Inside(sz) {
+			res = append(res, t)
+		}
+	}
+	return res
+}
+
+func Neighbors8Boxed(v, sz Vec) []Vec {
+	res := make([]Vec, 0)
+	for dx := -1; dx < 2; dx++ {
+		for dy := -1; dy < 2; dy++ {
+			if dx == 0 && dy == 0 {
+				continue
+			}
+			t := Vec{v.X + dx, v.Y + dy}
 			if t.Inside(sz) {
-				ch <- t
+				res = append(res, t)
 			}
 		}
-		close(ch)
-	}()
-	return ch
-}
-
-func Neighbors8Boxed(v Vec, sz Vec) chan Vec {
-	ch := make(chan Vec)
-	go func() {
-		for dx := -1; dx < 2; dx++ {
-			for dy := -1; dy < 2; dy++ {
-				if dx == 0 && dy == 0 {
-					continue
-				}
-				t := Vec{v.X + dx, v.Y + dy}
-				if t.Inside(sz) {
-					ch <- t
-				}
-			}
-		}
-		close(ch)
-	}()
-	return ch
+	}
+	return res
 }
 
 type Vec3 struct {
