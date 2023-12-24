@@ -19,7 +19,7 @@ func isHub(pos Vec, field []string) bool {
 	return slopes > 1
 }
 
-func walkNextHub(steps int, prev, pos Vec, field []string, hubs map[Vec]int) Edge {
+func walkNextHub(steps, steps2 int, prev, pos Vec, field []string, hubs map[Vec]int) Edge {
 	hubId, ok := hubs[pos]
 	if ok {
 		return Edge{hubId, steps}
@@ -28,7 +28,7 @@ func walkNextHub(steps int, prev, pos Vec, field []string, hubs map[Vec]int) Edg
 		if next == prev || field[next.X][next.Y] == '#' {
 			continue
 		}
-		return walkNextHub(steps+1, pos, next, field, hubs)
+		return walkNextHub(steps+1, steps2+1, pos, next, field, hubs)
 	}
 	panic("")
 }
@@ -61,8 +61,10 @@ func parse(filepath string, ignoreSlope bool) [][]Edge {
 		'v': {1, 0},
 		'^': {-1, 0},
 	}
+	directions := [4]Vec{{-1, 0}, {1, 0}, {0, 1}, {0, -1}}
+
 	for pos, id := range hubs {
-		for _, d := range [4]Vec{{-1, 0}, {1, 0}, {0, 1}, {0, -1}} {
+		for _, d := range directions {
 			n := pos.Add(d)
 			if !n.Inside(sz) {
 				continue
@@ -72,7 +74,7 @@ func parse(filepath string, ignoreSlope bool) [][]Edge {
 				continue
 			}
 			if ignoreSlope || cell == '.' || d == dir[cell] {
-				hub := walkNextHub(1, pos, n, field, hubs)
+				hub := walkNextHub(1, 1, pos, n, field, hubs)
 				next[id] = append(next[id], hub)
 			}
 		}
