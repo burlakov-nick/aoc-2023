@@ -7,21 +7,32 @@ import (
 )
 
 func Solve(filepath string) {
-	next := map[string][]string{}
-	edges := make([]Edge, 0)
-	nodes := make([]string, 0)
-	for _, line := range ReadLines(filepath) {
+	ids := map[string]int{}
+	n := 0
+	lines := ReadLines(filepath)
+	for _, line := range lines {
 		tokens := strings.Split(line, " ")
-		from := tokens[0]
-		nodes = append(nodes, from)
-		for _, to := range tokens[1:] {
+		for _, t := range tokens {
+			if _, ok := ids[t]; !ok {
+				ids[t] = n
+				n += 1
+			}
+		}
+	}
+
+	next := make([][]int, n)
+	edges := make([]Edge, 0)
+	for _, line := range lines {
+		tokens := strings.Split(line, " ")
+		from := ids[tokens[0]]
+		for _, name := range tokens[1:] {
+			to := ids[name]
 			edge := Edge{from, to}
 			edges = append(edges, edge)
 			next[from] = append(next[from], to)
 			next[to] = append(next[to], from)
 		}
 	}
-	start := edges[0].from
 
 	var wg sync.WaitGroup
 	jobQueue := make(chan []Edge)
@@ -29,7 +40,7 @@ func Solve(filepath string) {
 	for i := 0; i < workers; i++ {
 		go func() {
 			for banned := range jobQueue {
-				tryFindBridge(start, nodes, next, banned)
+				tryFindBridge(n, next, banned)
 				wg.Done()
 			}
 		}()
@@ -46,10 +57,10 @@ func Solve(filepath string) {
 }
 
 type Edge struct {
-	from, to string
+	from, to int
 }
 
-func isBanned(v, to string, banned []Edge) bool {
+func isBanned(v, to int, banned []Edge) bool {
 	for _, ban := range banned {
 		if ban.from == v && ban.to == to || ban.from == to && ban.to == v {
 			return true
@@ -58,23 +69,26 @@ func isBanned(v, to string, banned []Edge) bool {
 	return false
 }
 
-func tryFindBridge(start string, nodes []string, next map[string][]string, banned []Edge) {
+func tryFindBridge(n int, next [][]int, banned []Edge) {
+	visited := make([]bool, n)
+	time := make([]int, n)
+	minUp := make([]int, n)
 	s := State{
 		timer:   0,
-		time:    map[string]int{},
-		minUp:   map[string]int{},
-		visited: NewSet[string](),
+		time:    time,
+		minUp:   minUp,
+		visited: visited,
 		next:    next,
 		banned:  banned,
 	}
-	ok, from, to := findBridge(start, "", &s)
+	ok, from, to := findBridge(0, -1, &s)
 	if ok {
 		bannedNew := []Edge{banned[0], banned[1], {from, to}}
 		res := 1
-		visited := NewSet[string]()
-		for _, v := range nodes {
-			if !visited.Contains(v) {
-				res *= count(v, visited, next, bannedNew)
+		used := make([]bool, n)
+		for i := 0; i < n; i++ {
+			if !used[i] {
+				res *= count(i, used, next, bannedNew)
 			}
 		}
 		println(res)
@@ -83,11 +97,11 @@ func tryFindBridge(start string, nodes []string, next map[string][]string, banne
 
 }
 
-func count(v string, visited Set[string], next map[string][]string, banned []Edge) int {
+func count(v int, visited []bool, next [][]int, banned []Edge) int {
 	res := 1
-	visited.Add(v)
+	visited[v] = true
 	for _, to := range next[v] {
-		if !visited.Contains(to) && !isBanned(v, to, banned) {
+		if !visited[to] && !isBanned(v, to, banned) {
 			res += count(to, visited, next, banned)
 		}
 	}
@@ -96,14 +110,14 @@ func count(v string, visited Set[string], next map[string][]string, banned []Edg
 
 type State struct {
 	timer       int
-	time, minUp map[string]int
-	visited     Set[string]
-	next        map[string][]string
+	time, minUp []int
+	visited     []bool
+	next        [][]int
 	banned      []Edge
 }
 
-func findBridge(v, prev string, s *State) (bool, string, string) {
-	s.visited.Add(v)
+func findBridge(v, prev int, s *State) (bool, int, int) {
+	s.visited[v] = true
 	s.time[v] = s.timer
 	s.minUp[v] = s.timer
 	s.timer += 1
@@ -111,7 +125,7 @@ func findBridge(v, prev string, s *State) (bool, string, string) {
 		if to == prev || isBanned(v, to, s.banned) {
 			continue
 		}
-		if s.visited.Contains(to) {
+		if s.visited[to] {
 			s.minUp[v] = min(s.minUp[v], s.time[to])
 		} else {
 			ok, r1, r2 := findBridge(to, v, s)
@@ -124,5 +138,5 @@ func findBridge(v, prev string, s *State) (bool, string, string) {
 			}
 		}
 	}
-	return false, "", ""
+	return false, -1, -1
 }
